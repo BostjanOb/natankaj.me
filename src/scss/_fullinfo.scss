@@ -1,0 +1,18 @@
+#fullInfo {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 300px;
+	background: white;
+	height: 100%;
+
+	> button {
+		position: absolute;
+		left: 300px;
+	}
+
+	.card {
+		overflow: scroll;
+		height: 100%;
+	}
+}
