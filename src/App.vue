@@ -3,15 +3,12 @@
 		<div id="map"></div>
 		<div class="filter">
 			<div class="control is-grouped">
-				<button class="button" :class="{ 'is-primary': type == 'fuel95' }" @click="changeType('fuel95')">95
+				<button class="button"
+						v-for="(name, key) in types"
+						:class="{ 'is-primary': type == key }"
+						@click="changeType(key)">
+					{{ name }}
 				</button>
-				<button class="button" :class="{ 'is-primary': type == 'fuel100' }" @click="changeType('fuel100')">100
-				</button>
-				<button class="button" :class="{ 'is-primary': type == 'diesel' }" @click="changeType('diesel')">
-					Diesel
-				</button>
-				<button class="button" :class="{ 'is-primary': type == 'lpg' }" @click="changeType('lpg')">Lpg</button>
-				<button class="button" :class="{ 'is-primary': type == 'oil' }" @click="changeType('oil')">Oil</button>
 			</div>
 		</div>
 
@@ -22,14 +19,15 @@
 <script>
 	import MarkerWithLabel from './tools/markerwithlabel';
 	import InfoBox from './tools/infobox';
-
 	import FullInfo from './components/FullInfo.vue';
+	import * as constants from './constants';
 
 	export default {
 	    components: { FullInfo },
 		data() {
 			return {
 				map: null,
+				types: constants.FUEL_TYPES,
 				stations: [],
 				type: 'fuel95',
 				infobox: null,
@@ -111,20 +109,10 @@
 			getPriceTable(prices) {
 				let rt = '<table><tbody>';
 
-				if (prices.fuel95)
-					rt += `<tr><th>95</th><td>${prices.fuel95} €</td></tr>`;
-
-				if (prices.fuel100)
-					rt += `<tr><th>100</th><td>${prices.fuel100} €</td></tr>`;
-
-				if (prices.diesel)
-					rt += `<tr><th>Diesel</th><td>${prices.diesel} €</td></tr>`;
-
-				if (prices.lpg)
-					rt += `<tr><th>LPG</th><td>${prices.lpg} €</td></tr>`;
-
-				if (prices.oil)
-					rt += `<tr><th>Kurilno olje</th><td>${prices.oil} €</td></tr>`;
+				for( let type in constants.FUEL_TYPES ) {
+				    if ( prices[ type ] )
+						rt += `<tr><th>${constants.FUEL_TYPES[type]}</th><td>${prices[type]} €</td></tr>`;
+				}
 
 				rt += '</tbody></table>';
 				return rt;
@@ -162,11 +150,10 @@
 			});
 
 			if (navigator.geolocation) {
-				navigator.geolocation.getCurrentPosition(pos => {
-					this.map.setCenter({lat: pos.coords.latitude, lng: pos.coords.longitude});
+				navigator.geolocation.getCurrentPosition(({coords}) => {
+					this.map.setCenter({lat: coords.latitude, lng: coords.longitude});
 					this.map.setZoom(12);
-				}, () => {
-				});
+				}, () => {});
 			}
 
 			this.loadStations();
